@@ -25,25 +25,30 @@ export class PokemonSearch extends Component<User, SearchState> {
     };
   }
 
-  onSearchClick = () => {
+  onSearchClick = (): void => {
     const inputValue = this.pokemonRef.current.value;
-    fetch(`https://pokeapi.co/api/v2/pokemon/${inputValue}`).then((res) => {
-      if (res.status !== 200) {
-        this.setState({ error: true });
-        return;
-      }
-      res.json().then((data) => {
-        this.setState({
-          error: false,
-          pokemon: {
-            name: data.name,
-            numberOfAbilities: data.abilities.length,
-            baseExperience: data.base_experience,
-            imageUrl: data.sprites.front_default,
-          },
+    if (/^\s*$/.test(inputValue)) {
+      this.setState({ error: true });
+    } else {
+      fetch(`https://pokeapi.co/api/v2/pokemon/${inputValue}`).then((res) => {
+        if (res.status !== 200) {
+          this.setState({ error: true });
+          this.pokemonRef.current.value = "";
+          return;
+        }
+        res.json().then((data) => {
+          this.setState({
+            error: false,
+            pokemon: {
+              name: data.name,
+              numberOfAbilities: data.abilities.length,
+              baseExperience: data.base_experience,
+              imageUrl: data.sprites.front_default,
+            },
+          });
         });
       });
-    });
+    }
   };
 
   render() {
